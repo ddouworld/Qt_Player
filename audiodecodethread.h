@@ -16,7 +16,7 @@ public:
 
     void setPlayerCtx(FFmpegPlayerCtx *ctx);
 
-    void getAudioData(unsigned char *stream, int len);
+    int getAudioData(unsigned char *stream, int len);
 
     void run();
 public slots:

@@ -1,39 +1,25 @@
-#ifndef AUDIOPLAYER_H
-#define AUDIOPLAYER_H
+#ifndef AUDIOPLAY_H
+#define AUDIOPLAY_H
 #include <QAudioFormat>
 #include <QAudioSink>
-#include <QAudioBuffer>
 #include <QDebug>
-#include "audiodecodethread.h"
+#include "audiodevice.h"
 class AudioPlay :public QObject
 {
     Q_OBJECT
 public:
-    AudioPlay(AudioDecodeThread* audiodecode,QObject *parent = nullptr);
+    AudioPlay(QObject *parent = nullptr);
 
-    int openDevice(const QAudioFormat &format);
+    int openDevice(AudioDecodeThread* audio_decode_thread,const QAudioFormat &format);
 
     void start();
 
-    void stop();
-public slots:
-    // **当 QAudioDecoder 有新的音频数据时调用此函数**
-    void onBufferReady(QAudioBuffer buffer);
-    // **当解码完成时调用**
-    void onDecodingFinished();
-    //播放错误的时候调用此函数
-    void onDecodingError(QString error);
-    void play(QAudio::State state);
-    void startPlay();
+    void play(const char *data, qint64 len);
 
 
-
-public:
+private:
     QAudioSink* audioSink;
-    QIODevice *audioDevice;      // 音频设备 I/O
-    unsigned char *stream = nullptr;
-    AudioDecodeThread* m_audiodecode;
-
+    AudioDevice *audioDevice;      // 音频设备 I/O
 };
 
-#endif // AUDIOPLAYER_H
+#endif // AUDIOPLAY_H

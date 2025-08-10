@@ -27,17 +27,17 @@ void AudioDecodeThread::setPlayerCtx(FFmpegPlayerCtx *ctx)
 
 }
 
-void AudioDecodeThread::getAudioData(unsigned char *stream, int len)
+int AudioDecodeThread::getAudioData(unsigned char *stream, int len)
 {
     // decoder is not ready or in pause state, output silence
     if (!is->aCodecCtx || is->pause == PAUSE) {
         memset(stream, 0, len);
-        return;
+        return 0;
     }
 
-    int len1, audio_size;
+    int len1=0, audio_size=0;
     double pts;
-
+    int totalCopied = 0;  // 记录总共复制的字节数
     while(len > 0) {
         if (is->audio_buf_index >= is->audio_buf_size) {
             audio_size = audio_decode_frame(is, &pts);
@@ -57,15 +57,17 @@ void AudioDecodeThread::getAudioData(unsigned char *stream, int len)
         memcpy(stream, (uint8_t *)is->audio_buf + is->audio_buf_index, len1);
         len -= len1;
         stream += len1;
+        totalCopied += len1;  // 累加复制的字节数
         is->audio_buf_index += len1;
     }
+    return totalCopied;
 }
 
 void AudioDecodeThread::run()
 {
 
 
-    emit bufferReady();
+    //emit bufferReady();
     // int freesize = audioSink->bytesFree();
 
     // while (freesize) {

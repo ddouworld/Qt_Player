@@ -1,71 +1,31 @@
 #include "audioplayer.h"
-
-
-AudioPlay::AudioPlay(AudioDecodeThread* audiodecode,QObject *parent): QObject(parent)
+AudioPlay::AudioPlay(QObject *parent)
 {
-    m_audiodecode = audiodecode;
-    connect(m_audiodecode,&AudioDecodeThread::bufferReady,this,&AudioPlay::startPlay);
 
 }
 
-int AudioPlay::openDevice(const QAudioFormat &format)
+
+int AudioPlay::openDevice(AudioDecodeThread* audio_decode_thread,const QAudioFormat &format)
 {
+    // 创建自定义音频设备
+    audioDevice = new AudioDevice(audio_decode_thread);
+
     audioSink = new QAudioSink(format);
+    audioSink->setBufferSize(4096);
 
-    audioSink->setBufferSize(1024);
 
-    return 1;
+    return 0;
 }
 
 void AudioPlay::start()
 {
-    audioDevice  = audioSink->start();
-    connect(audioSink,&QAudioSink::stateChanged,this,&AudioPlay::play);
+    audioSink->start(audioDevice);
 
 }
 
-void AudioPlay::stop()
+
+void AudioPlay::play(const char *data, qint64 len)
 {
-    audioSink->stop();
+    //audioDevice->write(data,len);
 }
 
-void AudioPlay::onBufferReady(QAudioBuffer buffer)
-{
-    if (!buffer.isValid()) {
-        qWarning() << "无效的音频缓冲区";
-        return;
-    }
-
-    // **将音频数据写入 QAudioSink**
-    // QByteArray data = QByteArray(reinterpret_cast<const char*>(buffer.constData()), buffer.byteCount());
-    // audioDevice->write(data);
-}
-
-void AudioPlay::onDecodingFinished()
-{
-
-}
-
-void AudioPlay::onDecodingError(QString error)
-{
-
-}
-
-void AudioPlay::play(QAudio::State state)
-{
-    if(state == QAudio::IdleState)
-    {
-        int freesize = audioSink->bytesFree();
-        stream = new unsigned char[freesize];
-        m_audiodecode->getAudioData(stream,freesize);
-        audioDevice->write((char*)stream,freesize);
-    }
-}
-
-void AudioPlay::startPlay()
-{
-    int freesize = audioSink->bytesFree();
-    stream = new unsigned char[freesize];
-    m_audiodecode->getAudioData(stream,freesize);
-    audioDevice->write((char*)stream,freesize);
-}

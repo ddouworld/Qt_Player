@@ -157,8 +157,8 @@ int FFmpegPlayer::initPlayer()
     format.setChannelCount(2);   // 立体声
     format.setSampleFormat(QAudioFormat::Int16);
     // create and open audio play device
-    m_audioPlay = new AudioPlay(m_audioDecodeThread);
-    if (m_audioPlay->openDevice(format) <= 0) {
+    m_audioPlay = new AudioPlay();
+    if (m_audioPlay->openDevice(m_audioDecodeThread,format) <= 0) {
         ff_log_line("open audio device Failed.");
         return -1;
     }
@@ -174,7 +174,7 @@ void FFmpegPlayer::start()
 
     m_schedule_refresh = new QTimer(this);
     connect(m_schedule_refresh, &QTimer::timeout, this, &FFmpegPlayer::onRefreshEvent);
-    m_schedule_refresh->start(24); // 初始40ms
+    m_schedule_refresh->start(13); // 初始13ms
     m_stop = false;
 }
 
@@ -193,10 +193,10 @@ void FFmpegPlayer::stop()
 
     // stop audio thread
     ff_log_line("audio play thread clean...");
-    if (m_audioPlay) {
-        m_audioPlay->stop();
-        FREE(m_audioPlay);
-    }
+    // if (m_audioPlay) {
+    //     m_audioPlay->stop();
+    //     FREE(m_audioPlay);
+    // }
     ff_log_line("audio device finished.");
 
     // stop video decode thread
