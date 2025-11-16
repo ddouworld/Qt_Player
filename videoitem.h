@@ -20,6 +20,8 @@ public:
 public slots:
     void setUrl(QString url);
     void start();
+    void pause();
+    void seek(int rel);
     void update_img();
 public:
     Renderer *createRenderer() const override;

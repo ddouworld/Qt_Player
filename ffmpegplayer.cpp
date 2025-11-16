@@ -31,10 +31,7 @@ delete x; \
 }
 
 
-// static void schedule_refresh(FFmpegPlayerCtx *is, int delay)
-// {
-//     //SDL_AddTimer(delay, sdl_refresh_timer_cb, is);
-// }
+
 
 void FFmpegPlayer::video_display()
 {
@@ -42,7 +39,7 @@ void FFmpegPlayer::video_display()
     //调用回调显示视频
     if (vp->bmp ) {
         emit refresh();
-        //is->imgCb(vp->bmp->data[0], is->vCodecCtx->width, is->vCodecCtx->height, is->cbData);
+
     }
 }
 
@@ -52,16 +49,7 @@ YUVData FFmpegPlayer::getFrame()
     VideoPicture *vp =  &is->pictq[is->pictq_rindex];
   
     if (vp->bmp ) {
-       /* m_yuvData.Y.resize(vp->bmp->linesize[0]*is->vCodecCtx->height);
-        m_yuvData.Y =QByteArray((char*)vp->bmp->data[0],m_yuvData.Y.size());
-        m_yuvData.U.resize(vp->bmp->linesize[1]*is->vCodecCtx->height/2);
-        m_yuvData.U =QByteArray((char*)vp->bmp->data[1],m_yuvData.Y.size()/4);
-        m_yuvData.V.resize(vp->bmp->linesize[2]*is->vCodecCtx->height/2);
-        m_yuvData.V =QByteArray((char*)vp->bmp->data[2],m_yuvData.Y.size()/4);
-        m_yuvData.yLineSize =vp->bmp->linesize[0];
-        m_yuvData.uLineSize = vp->bmp->linesize[1];
-        m_yuvData.vLineSize = vp->bmp->linesize[2];
-        m_yuvData.height = is->vCodecCtx->height;*/
+
 
         int width = is->vCodecCtx->width;
         int height = is->vCodecCtx->height;
@@ -87,25 +75,34 @@ YUVData FFmpegPlayer::getFrame()
         m_yuvData.uLineSize = vp->bmp->linesize[1];
         m_yuvData.vLineSize = vp->bmp->linesize[2];
         m_yuvData.height = height;
-        //is->imgCb(vp->bmp->data[0], is->vCodecCtx->width, is->vCodecCtx->height, is->cbData);
+
+    }
+    else
+    {
+        int width = 1920;
+        int height = 1080;
+
+        // 正确提取 YUV 数据
+        int y_size = width * height;
+        int uv_size = y_size / 4;
+        m_yuvData.Y.resize(y_size);
+        m_yuvData.U.resize(uv_size);
+        m_yuvData.V.resize(uv_size);
+        memset(m_yuvData.Y.data(), 0, y_size); // 填充中性值
+        memset(m_yuvData.U.data(), 128, uv_size); // 填充中性值
+        memset(m_yuvData.V.data(), 128, uv_size); // 填充中性值
     }
     return m_yuvData;
 }
 
-static void FN_Audio_Cb(void *userdata, qint8 *stream, int len)
-{
-    AudioDecodeThread *dt = (AudioDecodeThread*)userdata;
-    //dt->getAudioData(stream, len);
-}
-
-void stream_seek(FFmpegPlayerCtx *is, int64_t pos, int rel)
-{
-    if (!is->seek_req) {
-        is->seek_pos = pos;
-        is->seek_flags = rel < 0 ? AVSEEK_FLAG_BACKWARD : 0;
-        is->seek_req = 1;
-    }
-}
+// void stream_seek(FFmpegPlayerCtx *is, int64_t pos, int rel)
+// {
+//     if (!is->seek_req) {
+//         is->seek_pos = pos;
+//         is->seek_flags = rel < 0 ? AVSEEK_FLAG_BACKWARD : 0;
+//         is->seek_req = 1;
+//     }
+// }
 
 FFmpegPlayer::FFmpegPlayer(QObject *parent): QObject(parent)
 {
@@ -144,14 +141,6 @@ int FFmpegPlayer::initPlayer()
     m_videoDecodeThread = new VideoDecodeThread;
     m_videoDecodeThread->setPlayerCtx(&playerCtx);
 
-    // render audio params
-    // audio_wanted_spec.freq = 48000;
-    // audio_wanted_spec.format = AUDIO_S16SYS;
-    // audio_wanted_spec.channels = 2;
-    // audio_wanted_spec.silence = 0;
-    // audio_wanted_spec.samples = SDL_AUDIO_BUFFER_SIZE;
-    // audio_wanted_spec.callback = FN_Audio_Cb;
-    // audio_wanted_spec.userdata = m_audioDecodeThread;
     QAudioFormat format;
     format.setSampleRate(48000); // 采样率 44.1kHz
     format.setChannelCount(2);   // 立体声
@@ -174,7 +163,7 @@ void FFmpegPlayer::start()
 
     m_schedule_refresh = new QTimer(this);
     connect(m_schedule_refresh, &QTimer::timeout, this, &FFmpegPlayer::onRefreshEvent);
-    m_schedule_refresh->start(13); // 初始13ms
+    m_schedule_refresh->start(40); // 初始40ms
     m_stop = false;
 }
 
@@ -221,12 +210,30 @@ void FFmpegPlayer::stop()
     ff_log_line("player ctx finished.");
 }
 
-void FFmpegPlayer::pause(PauseState state)
+void FFmpegPlayer::pause()
 {
-    playerCtx.pause = state;
+    if (playerCtx.pause == UNPAUSE) {
+        playerCtx.pause = PAUSE;
+    } else {
+         playerCtx.pause = UNPAUSE;
+    }
+    //playerCtx.pause = state;
 
     // reset frame_timer when restore pause state
     playerCtx.frame_timer = av_gettime() / 1000000.0;
+}
+
+void FFmpegPlayer::stream_seek(int rel)
+{
+    int pos = get_audio_clock(&playerCtx);
+    pos += rel;
+    qDebug()<<"seek to %lf v:%lf a:%lf" <<pos << get_audio_clock(&playerCtx)<< get_audio_clock(&playerCtx);
+    FFmpegPlayerCtx *is = &playerCtx;
+    if (!is->seek_req) {
+        is->seek_pos = (int64_t)(pos * AV_TIME_BASE);
+        is->seek_flags = rel < 0 ? AVSEEK_FLAG_BACKWARD : 0;
+        is->seek_req = 1;
+    }
 }
 
 
@@ -242,7 +249,6 @@ void FFmpegPlayer::onRefreshEvent()
 
     if(is->video_st) {
         if(is->pictq_size == 0) {
-            //schedule_refresh(is, 1);
             m_schedule_refresh->setInterval(1);
         } else {
             vp = &is->pictq[is->pictq_rindex];
@@ -275,14 +281,12 @@ void FFmpegPlayer::onRefreshEvent()
                 actual_delay = 0.010;
             }
 
-            //schedule_refresh(is, (int)(actual_delay * 1000 + 0.5));
             m_schedule_refresh->setInterval((int)(actual_delay * 1000 + 0.5));
             video_display();
 
             if (++is->pictq_rindex == VIDEO_PICTURE_QUEUE_SIZE) {
                 is->pictq_rindex = 0;
             }
-            //emit refresh();
             is->pictq_mutex->lock();
             is->pictq_size--;
             is->pictq_cond->notify_all();
@@ -290,6 +294,5 @@ void FFmpegPlayer::onRefreshEvent()
         }
     } else {
         m_schedule_refresh->setInterval(10);
-        //schedule_refresh(is, 100);
     }
 }

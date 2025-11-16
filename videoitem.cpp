@@ -26,10 +26,19 @@ void VideoItem::start()
     m_player->start();
 }
 
+void VideoItem::pause()
+{
+    qDebug()<<"暂停";
+    m_player->pause();
+}
+
+void VideoItem::seek(int rel)
+{
+    m_player->stream_seek(rel);
+}
+
 void VideoItem::update_img()
 {
-
-    //m_infoChanged= true;
     update();
 }
 

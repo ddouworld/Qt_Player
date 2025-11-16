@@ -60,6 +60,7 @@ int VideoDecodeThread::video_entry()
 
         if (is->pause == PAUSE) {
             //SDL_Delay(5);
+            QThread::sleep(5);
             continue;
         }
 

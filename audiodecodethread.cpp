@@ -32,7 +32,7 @@ int AudioDecodeThread::getAudioData(unsigned char *stream, int len)
     // decoder is not ready or in pause state, output silence
     if (!is->aCodecCtx || is->pause == PAUSE) {
         memset(stream, 0, len);
-        return 0;
+        return len;
     }
 
     int len1=0, audio_size=0;
@@ -67,36 +67,13 @@ void AudioDecodeThread::run()
 {
 
 
-    //emit bufferReady();
-    // int freesize = audioSink->bytesFree();
-
-    // while (freesize) {
-
-    // stream = new unsigned char[freesize];
-    // getAudioData(stream,freesize);
-    //audioDevice->write((char*)stream,freesize);
-    // //QThread::msleep(240);
-    // //freesize =  m_audioPlay->audioSink->bytesFree();
-    // qDebug()<<"播放音频"<<"freesize"<<freesize;
-    // }
 
 }
 
 void AudioDecodeThread::play(QtAudio::State state)
 {
 
-    // qDebug()<<"接受信号"<<state;
-    // if(state == QtAudio::IdleState)
-    // {
-    //     int freesize =  audioSink->bytesFree();
 
-    //     stream = new unsigned char[freesize];
-    //     getAudioData(stream,freesize);
-    //     audioDevice->write((char*)stream,freesize);
-    //     //QThread::msleep(240);
-    //     freesize =  audioSink->bytesFree();
-    //     //qDebug()<<"播放音频"<<"freesize";
-    // }
 
 
 }

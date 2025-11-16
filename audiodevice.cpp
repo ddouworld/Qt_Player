@@ -16,7 +16,7 @@ qint64 AudioDevice::readData(char *data, qint64 maxlen)
         return 0;
     }
     int size = m_audio_decode_thread->getAudioData((unsigned char*)data,maxlen);
-    m_free_size= size;
+    m_free_size = size;
     return size;
 }
 

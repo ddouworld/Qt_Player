@@ -170,7 +170,11 @@ public:
 
     void stop();
 
-    void pause(PauseState state);
+    void pause();
+
+    //快进或者后退
+    void stream_seek(int rel);
+
     //刷新事件
     void onRefreshEvent();
 

@@ -2,6 +2,7 @@
 #define AUDIODEVICE_H
 #include <QObject>
 #include <QDebug>
+#include <QMutex>
 #include "QIODevice"
 #include "audiodecodethread.h"
 
@@ -20,6 +21,7 @@ public:
 private:
     AudioDecodeThread* m_audio_decode_thread;
     int m_free_size = 4096;
+    QMutex m_mutex;
 };
 
 #endif // AUDIODEVICE_H
