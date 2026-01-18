@@ -1,7 +1,7 @@
 #include "AudioDecodeThread.h"
 
-#include "FFmpegPlayer.h"
-#include "log.h"
+#include "Player/FFmpegPlayer.h"
+#include "Log/log.h"
 #include <QAudioSink>
 #include <QDebug>
 AudioDecodeThread::AudioDecodeThread()

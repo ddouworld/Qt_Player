@@ -1,6 +1,6 @@
-#include "DemuxThread.h"
-#include "log.h"
-#include "FFmpegPlayer.h"
+#include "DemuxThread/DemuxThread.h"
+#include "Log/log.h"
+#include "Player/FFmpegPlayer.h"
 
 DemuxThread::DemuxThread()
 {

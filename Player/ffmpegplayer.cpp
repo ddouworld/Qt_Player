@@ -236,6 +236,38 @@ void FFmpegPlayer::stream_seek(int rel)
     }
 }
 
+double FFmpegPlayer::getPlayProgress()
+{
+    FFmpegPlayerCtx *is = &playerCtx;
+
+    // 1. 获取当前播放位置（优先用音频时钟，与seek逻辑对齐）
+    double current_pos = is->audio_clock;
+
+    // 2. 计算媒体总时长（从formatCtx的duration转换）
+    double total_duration = 0.0;
+    if (is->formatCtx != nullptr && is->formatCtx->duration != AV_NOPTS_VALUE) {
+        // 将AVFormatContext的duration（微秒）转为秒
+        total_duration = static_cast<double>(is->formatCtx->duration) / AV_TIME_BASE;
+    }
+
+    // 3. 边界校验：避免进度值超出合理范围
+    if (current_pos < 0.0) {
+        current_pos = 0.0;
+    }
+    if (total_duration > 0.0 && current_pos > total_duration) {
+        current_pos = total_duration;
+    }
+
+    // 4. 调试输出：对齐原stream_seek的日志风格，补充关键进度信息
+    double progress_percent = (total_duration > 0.0) ? (current_pos / total_duration) * 100.0 : 0.0;
+    qDebug() << "play progress - current: " << current_pos << "s, total: " << total_duration
+             << "s, percent: " << progress_percent << "%, audio_clock: " << is->audio_clock
+             << "s, video_clock: " << is->video_clock << "s";
+
+    // 5. 返回当前播放进度（秒）
+    return progress_percent;
+}
+
 
 void FFmpegPlayer::onRefreshEvent()
 {

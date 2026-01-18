@@ -2,7 +2,7 @@
 #define VIDEOITEM_H
 #include <QQuickItem>
 #include <QQuickFramebufferObject>
-#include "ffmpegplayer.h"
+#include "Player/ffmpegplayer.h"
 class VideoItem : public QQuickFramebufferObject
 {
     Q_OBJECT
@@ -23,6 +23,7 @@ public slots:
     void pause();
     void seek(int rel);
     void update_img();
+    double getPlayProgress();
 public:
     Renderer *createRenderer() const override;
 

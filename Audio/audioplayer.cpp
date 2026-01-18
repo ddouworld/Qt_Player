@@ -13,8 +13,6 @@ int AudioPlay::openDevice(AudioDecodeThread* audio_decode_thread,const QAudioFor
     audioSink = new QAudioSink(format);
     int bufferSize = 48000 * 2 * (16/8) * 0.5; // 计算缓冲大小
     audioSink->setBufferSize(bufferSize);
-
-
     return 0;
 }
 

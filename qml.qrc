@@ -1,5 +1,8 @@
 <RCC>
     <qresource prefix="/">
-        <file>main.qml</file>
+        <file>img/play.svg</file>
+        <file>img/puase.svg</file>
+        <file>qml/footer.qml</file>
+        <file>qml/main.qml</file>
     </qresource>
 </RCC>

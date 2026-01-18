@@ -1,7 +1,7 @@
 #include "VideoDecodeThread.h"
 
-#include "FFmpegPlayer.h"
-#include "log.h"
+#include "Player/FFmpegPlayer.h"
+#include "Log/log.h"
 
 static double synchronize_video(FFmpegPlayerCtx *is, AVFrame *src_frame, double pts)
 {

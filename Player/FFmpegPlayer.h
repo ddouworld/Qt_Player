@@ -1,7 +1,7 @@
 #ifndef FFMPEGPLAYER_H
 #define FFMPEGPLAYER_H
 
-#include "PacketQueue.h"
+#include "PacketQueue/PacketQueue.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -25,11 +25,11 @@ extern "C" {
 #include <condition_variable>
 #include <QObject>
 #include <QTimer>
-#include "demuxthread.h"
-#include "videodecodethread.h"
-#include "audioplayer.h"
-#include "audiodecodethread.h"
-#include "i420render.h"
+#include "DemuxThread/demuxthread.h"
+#include "VideoThread/videodecodethread.h"
+#include "Audio/audioplayer.h"
+#include "AudioThread/audiodecodethread.h"
+#include "VideoItem/i420render.h"
 #define MAX_AUDIO_FRAME_SIZE 192000
 
 #define VIDEO_PICTURE_QUEUE_SIZE 1
@@ -174,6 +174,9 @@ public:
 
     //快进或者后退
     void stream_seek(int rel);
+
+    //获取当前播放进度
+    double getPlayProgress();
 
     //刷新事件
     void onRefreshEvent();

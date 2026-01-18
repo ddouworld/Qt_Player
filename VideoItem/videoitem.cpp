@@ -42,6 +42,13 @@ void VideoItem::update_img()
     update();
 }
 
+double VideoItem::getPlayProgress()
+{
+    if(m_player)
+        return m_player->getPlayProgress();
+    return 0;
+}
+
 YUVData VideoItem::getFrame()
 {
     return m_player->getFrame();

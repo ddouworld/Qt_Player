@@ -41,19 +41,18 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
   qt_add_executable(New_Player
     MANUAL_FINALIZATION
     ${PROJECT_SOURCES}
-    videofboitem.h videofboitem.cpp
-    videoitem.h videoitem.cpp
-    i420render.h i420render.cpp
-    ffmpegplayer.h ffmpegplayer.cpp
-    packetqueue.h packetqueue.cpp
-    demuxthread.h demuxthread.cpp
-    log.h
-    threadbase.h threadbase.cpp
-    videodecodethread.h videodecodethread.cpp
-    audiodecodethread.h audiodecodethread.cpp
-    audioplayer.h audioplayer.cpp
-    log.cpp
-    audiodevice.h audiodevice.cpp
+    VideoItem/videofboitem.h VideoItem/videofboitem.cpp
+    VideoItem/videoitem.h VideoItem/videoitem.cpp
+    VideoItem/i420render.h VideoItem/i420render.cpp
+    Player/ffmpegplayer.h Player/ffmpegplayer.cpp
+    PacketQueue/packetqueue.h PacketQueue/packetqueue.cpp
+    DemuxThread/demuxthread.h DemuxThread/demuxthread.cpp
+    Thread/threadbase.h Thread/threadbase.cpp
+    VideoThread/videodecodethread.h VideoThread/videodecodethread.cpp
+    AudioThread/audiodecodethread.h AudioThread/audiodecodethread.cpp
+    Audio/audioplayer.h Audio/audioplayer.cpp
+    Log/log.h Log/log.cpp
+    Audio/audiodevice.h Audio/audiodevice.cpp
   )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET New_Player APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
@@ -72,7 +71,19 @@ else()
   )
 endif()
 endif()
-
+# 核心修改：补充 ${CMAKE_CURRENT_SOURCE_DIR}（项目根目录）
+target_include_directories(New_Player
+  PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}        # 项目根目录头文件（可选，方便引用根目录的 .h 文件）
+    ${CMAKE_CURRENT_SOURCE_DIR}/Thread
+    ${CMAKE_CURRENT_SOURCE_DIR}/VideoItem  # VideoItem 目录头文件（可选，按需添加）
+    ${CMAKE_CURRENT_SOURCE_DIR}/VideoThread
+    ${CMAKE_CURRENT_SOURCE_DIR}/AudioThread
+    ${CMAKE_CURRENT_SOURCE_DIR}/DemuxThread
+    ${CMAKE_CURRENT_SOURCE_DIR}/Player
+    ${CMAKE_CURRENT_SOURCE_DIR}/Log
+    ${CMAKE_CURRENT_SOURCE_DIR}/Audio
+)
 target_link_libraries(New_Player
   PRIVATE Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Quick
   Qt6::Multimedia
