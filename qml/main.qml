@@ -4,19 +4,19 @@ import VideoItem 1.0
 import QtQuick.Controls
 import QtQuick.Controls.Basic
 import QtQuick.Layouts
+import "footer"
 Window {
     width: 1920
     height: 1080
     visible: true
     title: qsTr("视频播放器")
-    property bool isPlay: false;
+    property bool isPlay: flase;
     Timer{
         id:getPlayProgress;
-        interval: 100;
+        interval: 10;
         repeat: true;
         onTriggered: {
             var progress = videoitem.getPlayProgress();
-            console.log("进度->",progress)
             videoProgress.value = progress;
         }
     }
@@ -28,14 +28,14 @@ Window {
         focus: true         // 不设置焦点，获取不了键盘事件
         Keys.onPressed: {
 
-                    // if(event.key === 81)
-                    // {
-                    //       console.log("text:"+event.text)
-                    //     console.log("按下q")
-                    //     videoitem.pause()
-                    // }
+            // if(event.key === 81)
+            // {
+            //       console.log("text:"+event.text)
+            //     console.log("按下q")
+            //     videoitem.pause()
+            // }
 
-                }
+        }
 
         Keys.onSpacePressed:
         {
@@ -66,13 +66,12 @@ Window {
             button.visible = false;
         }
     }
-    // 动态加载 BottomBar.qml
-       Loader {
-           id: bottomBarLoader
-           source: "qrc:/Footer.qml"  // 文件路径
-           anchors.bottom: parent.bottom
-           width: parent.width
-       }
+    Footer{
+        id:videoProgress
+        width: parent.width
+        anchors.bottom: parent.bottom
+        value: 20;
+    }
 
 
 }

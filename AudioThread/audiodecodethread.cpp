@@ -30,7 +30,7 @@ void AudioDecodeThread::setPlayerCtx(FFmpegPlayerCtx *ctx)
 int AudioDecodeThread::getAudioData(unsigned char *stream, int len)
 {
     // decoder is not ready or in pause state, output silence
-    if (!is->aCodecCtx || is->pause == PAUSE) {
+    if (!is->aCodecCtx || is->pause == PAUSE || is->is_end) {
         memset(stream, 0, len);
         return len;
     }
@@ -72,8 +72,6 @@ void AudioDecodeThread::run()
 
 void AudioDecodeThread::play(QtAudio::State state)
 {
-
-
 
 
 }

@@ -84,7 +84,11 @@ int DemuxThread::decode_loop()
             ff_log_line("request quit while decode_loop");
             break;
         }
-
+        if(is->is_end)
+        {
+            QThread::msleep(10); // 暂停100毫秒
+            continue;
+        }
         // begin seek
         if (is->seek_req) {
             int stream_index= -1;
@@ -120,12 +124,18 @@ int DemuxThread::decode_loop()
 
         if (is->audioq.packetSize() > MAX_AUDIOQ_SIZE || is->videoq.packetSize() > MAX_VIDEOQ_SIZE) {
             //SDL_Delay(10);
+            QThread::msleep(10); // 暂停100毫秒
             continue;
         }
-
-        if (av_read_frame(is->formatCtx, packet) < 0) {
-            ff_log_line("av_read_frame error");
-            break;
+        int ret;
+        if ((ret = av_read_frame(is->formatCtx, packet)) < 0) {
+            if(ret == AVERROR_EOF)
+                is->is_end = true;
+            else
+            {
+                ff_log_line("av_read_frame error");
+                break;
+            }
         }
 
         if (packet->stream_index == is->videoStream) {

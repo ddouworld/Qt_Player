@@ -3,6 +3,8 @@ import QtQuick.Layouts
 import QtQuick.Controls
 import QtQuick.Controls.Basic
 Item {
+    id:progress
+    property double value: 0;
     ColumnLayout{
         width:parent.width;
         anchors.bottom: parent.bottom;
@@ -12,6 +14,7 @@ Item {
             width: parent.width
             height: 8  // 进度条高度（可根据需求调整）
             to:100;
+            value:progress.value
             background: Rectangle {
                 width: videoProgress.width
                 height: videoProgress.height

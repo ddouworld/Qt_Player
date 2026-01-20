@@ -158,7 +158,7 @@ void FFmpegPlayer::start()
 {
     m_demuxThread->start();
     m_videoDecodeThread->start();
-    m_audioDecodeThread->start();
+    //m_audioDecodeThread->start();
     m_audioPlay->start();
 
     m_schedule_refresh = new QTimer(this);
@@ -233,6 +233,7 @@ void FFmpegPlayer::stream_seek(int rel)
         is->seek_pos = (int64_t)(pos * AV_TIME_BASE);
         is->seek_flags = rel < 0 ? AVSEEK_FLAG_BACKWARD : 0;
         is->seek_req = 1;
+        is->is_end = false;
     }
 }
 

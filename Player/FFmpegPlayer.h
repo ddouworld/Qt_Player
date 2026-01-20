@@ -87,6 +87,7 @@ struct FFmpegPlayerCtx {
     int              seek_flags;
     int64_t          seek_pos;
 
+    bool             is_end = false;
     // flush flag for seek
     std::atomic<bool> flush_actx = false;
     std::atomic<bool> flush_vctx = false;
